@@ -380,23 +380,14 @@ def cornersHeuristic(state, problem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-    "*** YOUR CODE HERE ***"
-
-    x,y = state[0]
-
+    "*** YOUR CODE HERE ***"    
+    
     total = 9999
     for i in corners:
-        x2, y2 = i
+        manhattan = util.manhattanDistance(i, state[0])
 
-        # euclidean = ( (x - x2) ** 2 + (y - y2) ** 2 ) ** 0.5
-        dx = abs(x2 - x)
-        dy = abs(y2 - y)
-        D = 1
-
-        m = D * (dx + dy)
-
-        if m < total:
-            total = m
+        if manhattan < total:
+            total = manhattan
     
     return total
     return 0 # Default to trivial solution

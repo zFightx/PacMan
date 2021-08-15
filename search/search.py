@@ -178,39 +178,50 @@ def uniformCostSearch(problem):
     visited = []
     moves = []
 
+    #Marca start como visitado
     visited.append(start)
 
+    #Coloca seus sucessores na fila
     for i in problem.getSuccessors(start):
         d = i[2]
         
         queue.push( (i[0], [i[1]], d), d)
         visited.append(i[0])
 
+    # Enquanto nao for vazia
     while not queue.isEmpty():
+        # Remove da fila e expande
         v = queue.pop()
         
+        # Se for o objetivo, encerra
         if problem.isGoalState(v[0]):
             moves = v[1]
             break
 
+        # Expande o no
         for i in problem.getSuccessors(v[0]):
             d = i[2]
 
+            # Se nao tiver sido visitado anteriormente
             if not i[0] in visited:
                 road = v[1][:]
                 road.append(i[1])
 
                 queue.push( (i[0], road, d+v[2]), d+v[2])
                 visited.append(i[0])  
+            # Caso contrario, verifica se distancia atual eh menor
             else:
                 for index, j in enumerate(queue.heap):
                     if j[2][0] == i[0]:
                         if d+v[2] < j[2][2]:
+                            # Deleta o pre armazenado
                             del queue.heap[index]
 
+                            # reconstroi o caminho
                             road = v[1][:]
                             road.append(i[1])
     
+                            # recola na fila com a distancia e prioridade atualizada
                             queue.push( (i[0], road, d+v[2]), d+v[2])
                             break
     
@@ -233,27 +244,37 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     visited = []
     moves = []
 
+    # Calcula heuristica do start e insere na fila e visitados
     hi = heuristic(start, problem)
     queue.push( (start, [], 0), hi)
     visited.append(start)
 
     while not queue.isEmpty():
+        # remove por prioridade e expande
         v = queue.pop()
         
+        # Se for objetivo, encerra
         if problem.isGoalState(v[0]):
             moves = v[1]
             break
 
+        # Expandindo
         for i in problem.getSuccessors(v[0]):
+            # Calcula heuristica e pega a distancia
             h = heuristic(i[0], problem)
             d = i[2]
 
+            # Se nao tiver sido visitado anteriormente
             if not i[0] in visited:
+                #Cria a rota
                 road = v[1][:]
                 road.append(i[1])
 
+                # Insere na fila com prioridade usando heuristica
                 queue.push( (i[0], road, d+v[2]), d+v[2]+h)
                 visited.append(i[0])  
+                
+            # Se ja foi visitado, entao verifica se distancia eh menor
             else:
                 for index, j in enumerate(queue.heap):
                     if j[2][0] == i[0]:

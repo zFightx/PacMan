@@ -295,6 +295,7 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
+        return (self.startingPosition, ())
         util.raiseNotDefined()
 
     def isGoalState(self, state):
@@ -302,6 +303,9 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
+
+        # Verifica se o estado atual possui todos os goal em sua tupla
+        return len(state[1]) == len(self.corners)
         util.raiseNotDefined()
 
     def getSuccessors(self, state):
@@ -315,6 +319,8 @@ class CornersProblem(search.SearchProblem):
             is the incremental cost of expanding to that successor
         """
 
+        # Pega a posicao atual x, y
+        x,y = state[0]
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
@@ -325,6 +331,22 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            dx,dy = Actions.directionToVector(action)          
+            nextx, nexty = int(x + dx), int(y+dy)
+            hitsWall = self.walls[nextx][nexty]
+
+            # Verifica se eh alguma parede
+            if not hitsWall:
+                # Tupla de goal ate o estado atual
+                tupleCorners = state[1]
+                
+                # Se Proxima posical estiver na lista de goals e ainda nao estiver na tupla de goals
+                if (nextx, nexty) in self.corners and not (nextx, nexty) in tupleCorners:
+                    # Concatena tupla de goal do estado atual com a proxima posicao
+                    tupleCorners = tupleCorners + ( (nextx, nexty), )
+
+                # adiciona sucessor com a tupla de goals
+                successors.append( ( ( (nextx, nexty), tupleCorners ), action, 1) )
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -358,8 +380,25 @@ def cornersHeuristic(state, problem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-
     "*** YOUR CODE HERE ***"
+
+    x,y = state[0]
+
+    total = 9999
+    for i in corners:
+        x2, y2 = i
+
+        # euclidean = ( (x - x2) ** 2 + (y - y2) ** 2 ) ** 0.5
+        dx = abs(x2 - x)
+        dy = abs(y2 - y)
+        D = 1
+
+        m = D * (dx + dy)
+
+        if m < total:
+            total = m
+    
+    return total
     return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
